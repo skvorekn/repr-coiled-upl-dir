@@ -1,0 +1,9 @@
+name: my_env
+channels:
+  - anaconda
+  - conda-forge
+  - numba
+  - defaults
+dependencies:
+  - coiled=0.0.60
+  - dask=2021.10.0
