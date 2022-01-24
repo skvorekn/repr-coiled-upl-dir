@@ -12,6 +12,13 @@ get_prefix()
 
 local = False # This script works if run on LocalCluster (local = True)
 
+def update_path(dask_worker):
+        import pathlib
+        import sys
+        path = str(pathlib.Path(dask_worker.local_directory).parent)
+        if path not in sys.path:
+            sys.path.insert(0, path)
+
 if __name__ == "__main__":
 
     if local:
@@ -36,9 +43,9 @@ if __name__ == "__main__":
                 )
         client = Client(cluster)
 
-        # client.run(update_path)
+        client.run(update_path)
 
-        client.register_worker_plugin(UploadDirectory('pipeline', update_path=True, restart = True),
+        client.register_worker_plugin(UploadDirectory('pipeline', update_path=False, restart=False),
                                      nanny=True)
 
     print("Created client")
