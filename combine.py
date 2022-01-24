@@ -36,8 +36,10 @@ if __name__ == "__main__":
                 )
         client = Client(cluster)
 
-        client.register_worker_plugin(UploadDirectory('pipeline'),
-                                        nanny=True, update_path = True, restart = True)
+        # client.run(update_path)
+
+        client.register_worker_plugin(UploadDirectory('pipeline', update_path=True, restart = True),
+                                     nanny=True)
 
     print("Created client")
 
