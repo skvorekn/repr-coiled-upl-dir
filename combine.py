@@ -3,10 +3,8 @@ import os
 from dask.distributed import Client, LocalCluster
 from distributed.diagnostics.plugin import UploadDirectory
 
-import os
-
-from external_fns.misc import get_prefix
-from pipeline.functions.item_level import runner
+from py_functions.misc import get_prefix
+from py_functions.pipeline.item_level import runner
 
 get_prefix()
 
