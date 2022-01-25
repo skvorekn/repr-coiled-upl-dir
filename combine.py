@@ -44,7 +44,7 @@ if __name__ == "__main__":
                         name=random_string,
                         software='jason-larsen/965',
                         account='jason-larsen',
-                        n_workers=1,
+                        n_workers=3,
                         worker_cpu=1,
                         worker_class='distributed.Nanny'
                     )
