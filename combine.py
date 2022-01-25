@@ -2,13 +2,18 @@ import coiled
 import os
 from dask.distributed import Client, LocalCluster
 from distributed.diagnostics.plugin import UploadDirectory
+from tenacity import retry
+import random
+import string
+import time
 
 from py_functions.misc import get_prefix
 from py_functions.pipeline.item_level import runner
 
 get_prefix()
 
-local = False # This script works if run on LocalCluster (local = True)
+local = False
+create_new_cluster = True
 
 def update_path(dask_worker):
         import pathlib
@@ -16,6 +21,7 @@ def update_path(dask_worker):
         path = str(pathlib.Path(dask_worker.local_directory).parent)
         if path not in sys.path:
             sys.path.insert(0, path)
+        return sys.path
 
 if __name__ == "__main__":
 
@@ -31,37 +37,41 @@ if __name__ == "__main__":
         #             force_rebuild=True
         #         )
 
-        cluster = coiled.Cluster(
-                    name='kelsey-test',
-                    software='jason-larsen/965',
-                    account='jason-larsen',
-                    n_workers=1,
-                    worker_cpu=1,
-                    worker_class='distributed.Nanny'
-                )
+        @retry
+        def create_cluster():
+            random_string = ''.join([random.choice(string.ascii_lowercase) for i in range(10)])
+            cluster = coiled.Cluster(
+                        name=random_string,
+                        software='jason-larsen/965',
+                        account='jason-larsen',
+                        n_workers=1,
+                        worker_cpu=1,
+                        worker_class='distributed.Nanny'
+                    )
+            return cluster
+
+        if create_new_cluster:
+            cluster = create_cluster()
+        else:
+            cluster = coiled.Cluster(name="ytdubbclaa")
+
         client = Client(cluster)
+        time.sleep(10)
 
-        client.run(update_path)
+        path = client.run(update_path)
+        print(path)
 
-        client.register_worker_plugin(UploadDirectory('pipeline', update_path=False, restart=False),
+        client.register_worker_plugin(UploadDirectory('py_functions', update_path=False, restart=False),
                                      nanny=True)
 
     print("Created client")
 
     # See what the directory structure looks like
     def test_func():
-        dirs = []
-        for d in os.walk('dask-worker-space'):
-            dirs.append(d)
-        return dirs
+        import sys
+        return sys.path
 
-    job = client.submit(test_func)
-    print(job.result())
-    #[('dask-worker-space', ['pipeline', 'worker-tpsqragy'], ['purge.lock', 'global.lock', 'worker-tpsqragy.dirlock']),
-    # ('dask-worker-space/pipeline', ['functions'], ['__init__.py', 'errors.py']), 
-    # ('dask-worker-space/pipeline/functions', [], ['__init__.py', 'item_level.py']), 
-    # ('dask-worker-space/worker-tpsqragy', ['storage'], []), 
-    # ('dask-worker-space/worker-tpsqragy/storage', [], [])]
+    result = client.run(test_func)
+    print(result)
 
     runner(client)
-
