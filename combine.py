@@ -14,6 +14,7 @@ get_prefix()
 
 local = False
 create_new_cluster = True
+n_workers = 3
 
 def update_path(dask_worker):
         import pathlib
@@ -43,7 +44,7 @@ if __name__ == "__main__":
                         name='kelsey-test',
                         software='jason-larsen/my_env',
                         account='jason-larsen',
-                        n_workers=3,
+                        n_workers=n_workers,
                         worker_cpu=1,
                         worker_class='distributed.Nanny'
                     )
@@ -52,7 +53,7 @@ if __name__ == "__main__":
         cluster = create_cluster()
 
         client = Client(cluster)
-        client.wait_for_workers(3)
+        client.wait_for_workers(n_workers)
 
         path = client.run(update_path)
         print(path)
@@ -70,4 +71,4 @@ if __name__ == "__main__":
     result = client.run(test_func)
     print(result)
 
-    runner(client)
+    runner(client, n_workers)
