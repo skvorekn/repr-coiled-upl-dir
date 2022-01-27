@@ -30,19 +30,18 @@ if __name__ == "__main__":
         client = Client(cluster)
 
     else:
-        # coiled.create_software_environment(
-        #             name='jason-larsen/965',
-        #             conda_env_name='base',
-        #             conda='my_env.yml',
-        #             force_rebuild=True
-        #         )
+        coiled.create_software_environment(
+                    name='jason-larsen/my_env',
+                    conda_env_name='base',
+                    conda='my_env.yml',
+                    force_rebuild=True
+                )
 
         @retry
         def create_cluster():
-            random_string = ''.join([random.choice(string.ascii_lowercase) for i in range(10)])
             cluster = coiled.Cluster(
-                        name=random_string,
-                        software='jason-larsen/965',
+                        name='kelsey-test',
+                        software='jason-larsen/my_env',
                         account='jason-larsen',
                         n_workers=3,
                         worker_cpu=1,
@@ -50,10 +49,7 @@ if __name__ == "__main__":
                     )
             return cluster
 
-        if create_new_cluster:
-            cluster = create_cluster()
-        else:
-            cluster = coiled.Cluster(name="ytdubbclaa")
+        cluster = create_cluster()
 
         client = Client(cluster)
         time.sleep(10)
