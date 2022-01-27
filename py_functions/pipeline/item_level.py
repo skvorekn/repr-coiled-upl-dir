@@ -1,6 +1,7 @@
 from dask.distributed import as_completed
 from py_functions.errors import Error
 from py_functions.misc import get_prefix
+from tenacity import retry
 
 def runner(client):
     jobs = []
@@ -12,5 +13,6 @@ def runner(client):
         result = future.result()
         print(result)
 
+@retry
 def combine():
     return ['test','list']
