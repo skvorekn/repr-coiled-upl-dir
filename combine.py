@@ -30,12 +30,12 @@ if __name__ == "__main__":
         client = Client(cluster)
 
     else:
-        coiled.create_software_environment(
-                    name='jason-larsen/my_env',
-                    conda_env_name='base',
-                    conda='my_env.yml',
-                    force_rebuild=True
-                )
+        # coiled.create_software_environment(
+        #             name='jason-larsen/my_env',
+        #             conda_env_name='base',
+        #             conda='my_env.yml',
+        #             force_rebuild=True
+        #         )
 
         @retry
         def create_cluster():
@@ -52,7 +52,7 @@ if __name__ == "__main__":
         cluster = create_cluster()
 
         client = Client(cluster)
-        time.sleep(10)
+        client.wait_for_workers(3)
 
         path = client.run(update_path)
         print(path)
