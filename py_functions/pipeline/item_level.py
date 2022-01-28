@@ -24,4 +24,5 @@ def runner(client, n_workers):
 
 @retry
 def combine():
+    get_prefix()
     return ['test','list']
